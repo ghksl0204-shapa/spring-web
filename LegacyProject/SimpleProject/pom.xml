@@ -203,7 +203,7 @@
 		    <version>5.5.2</version>
 		</dependency>
 		
-		<!-- 파일 업로드를 위한 라이브러리 -->
+		<!-- 4. 파일 업로드를 위한 라이브러리 -->
 		<dependency>
 		    <groupId>commons-fileupload</groupId>
 		    <artifactId>commons-fileupload</artifactId>

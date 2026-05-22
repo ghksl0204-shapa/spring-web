@@ -13,14 +13,17 @@
 		       STATUS = 'Y'           
 	</select>
 
-	<select id="findAll" resultType="com.kh.spring.board.model.dto.BoardDto">
+	<sql id="boardColumn">
 		SELECT
-		       BOARD_NO,
-		       BOARD_TITLE,
-		       BOARD_WRITER,
-		       COUNT,
-		       TO_CHAR(CREATE_DATE, 'YYYY-MM-DD') as createDate,
-		       CHANGE_NAME
+	       	   BOARD_NO,
+	           BOARD_TITLE,
+	           BOARD_WRITER,
+	           COUNT,
+	           TO_CHAR(CREATE_DATE, 'YYYY-MM-DD') as createDate,
+	           CHANGE_NAME
+	</sql>
+	<select id="findAll" resultType="com.kh.spring.board.model.dto.BoardDto">
+		<include refid="boardColumn" />
 		  FROM
 		       BOARD
 		 WHERE
@@ -47,4 +50,76 @@
 		       DEFAULT
 		       )       
 	</insert>
+	
+	<update id="increaseCount">
+		UPDATE
+		       BOARD
+		   SET
+		       COUNT = COUNT + 1
+		 WHERE
+		       BOARD_NO = #{boardNo}
+		   AND
+		       STATUS = 'Y'               
+	</update>
+	
+	<select id="findByBoardNo" resultType="com.kh.spring.board.model.dto.BoardDto">
+		<include refid="boardColumn" />
+		       ,BOARD_CONTENT,
+		       ORIGIN_NAME
+		  FROM
+		       BOARD
+		 WHERE
+		       STATUS = 'Y'
+		   AND
+		       BOARD_NO = #{boardNo}               
+	</select>
+	
+	<select id="findByKeywordCount" resultType="_int">
+		select
+		       count(*)
+		  from
+		       board
+		 where
+		       status = 'Y'
+		 <if test="condition == 'content'">
+		   and
+		       board_content
+		 </if>
+		 <if test="condition == 'writer'">
+		   and
+		       board_writer    
+		 </if>
+		 <if test="condition == 'title'">
+		   and
+		       board_title                   
+		 </if>
+		   like '%' || #{keyword} || '%'
+	</select>
+	
+	<select id="findByKeyword" resultType="com.kh.spring.board.model.dto.BoardDto">
+		<include refid="boardColumn" />
+		  from
+		       board
+		 where
+		       status = 'Y'
+		<choose>
+			<when test="condition == 'content'">
+		   and
+		       board_content
+			</when>
+			<when test="condition == 'writer'">
+		   and
+		       board_writer
+			</when>		       
+			<otherwise>
+		   and
+		       board_title                  
+			</otherwise>		       
+		</choose>
+		  like '%' || #{keyword} || '%'
+		 order
+	        by
+	           board_no desc        
+	</select>
+	<!-- OFFSET ${offset} ROWS FETCH NEXT #{limit} ROWS ONLY -->
 </mapper>

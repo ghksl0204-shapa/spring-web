@@ -68,10 +68,18 @@
                     </tr>
                 </thead>
                 <tbody>
+                
+                	<script>
+                		function toDetail(boardNo){
+                			location.href = `boards/\${boardNo}`;
+                		}
+                	
+                	</script>
+                
                 	<c:choose>
 						<c:when test="${ not empty map.boards }">
                 			<c:forEach var="board" items="${ map.boards }">
-			                    <tr>
+			                    <tr onclick="toDetail(${board.boardNo})">
 			                        <td>${ board.boardNo }</td>
 			                        <td>${ board.boardTitle }</td>
 			                        <td>${ board.boardWriter }</td>
@@ -100,7 +108,14 @@
                     <li class="page-item disabled"><a class="page-link" href="#">이전</a></li>
 
 					<c:forEach var="num" begin="${ map.pi.startPage }" end="${ map.pi.endPage }">
-	                    <li class="page-item"><a class="page-link" href="boards?page=${ num }">${ num }</a></li>
+						<c:choose>
+							<c:when test="${ empty condition }">
+			                    <li class="page-item"><a class="page-link" href="/spring/boards?page=${ num }">${ num }</a></li>
+							</c:when>
+							<c:otherwise>
+	    		                <li class="page-item"><a class="page-link" href="/spring/boards/keyword?page=${ num }&condition=${condition}&keyword=${keyword}">${ num }</a></li>
+							</c:otherwise>	                    
+						</c:choose>
 					</c:forEach>                    
 
                     <li class="page-item"><a class="page-link" href="#">다음</a></li>
@@ -109,7 +124,7 @@
 
             <br clear="both"><br>
 
-            <form id="searchForm" action="" method="get" align="center">
+            <form id="searchForm" action="/spring/boards/keyword" method="get" align="center">
                 <div class="select">
                     <select class="custom-select" name="condition">
                         <option value="writer">작성자</option>
@@ -118,13 +133,19 @@
                     </select>
                 </div>
                 <div class="text">
-                    <input type="text" class="form-control" name="keyword">
+                    <input type="text" class="form-control" name="keyword" value="${ keyword }">
                 </div>
                 <button type="submit" class="searchBtn btn btn-secondary">검색</button>
             </form>
             <br><br>
         </div>
         <br><br>
+        
+        <script>
+        	$(function(){
+        		$('#searchForm option[value=${condition}]').attr('selected', true);
+        	});
+        </script>
 
     </div>
 

@@ -25,5 +25,9 @@ public interface MemberMapper {
 	@Delete("DELETE FROM MEMBER WHERE USER_ID = #{userId} AND STATUS = 'Y'")
 	int delete(String userId);
 	
+	@Select("SELECT DECODE(COUNT(*), 1, 'N', 0, 'Y') FROM MEMBER WHERE USER_ID = #{userId}")
+	String checkId(String id);
+	
+	// 알아서 객체 생성하고 알아서 sqlSession을 호출해서 sql문 수행후 결과 반환
 	
 }

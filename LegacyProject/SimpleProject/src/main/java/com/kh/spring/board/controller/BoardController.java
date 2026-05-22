@@ -6,6 +6,7 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -65,6 +66,27 @@ public class BoardController {
 		 */
 		boardService.save(board, upfile, session);
 		return "redirect:boards";
+	}
+	
+	@GetMapping("/{id}")
+	public ModelAndView toDetail(@PathVariable(value="id") Long boardNo, ModelAndView mv) {
+//		BoardDto board = boardService.findByBoardNo(boardNo);
+		mv.addObject("board", boardService.findByBoardNo(boardNo)).setViewName("board/detail");
+		
+//		mv.setViewName("board/detail");
+		return mv;
+	}
+	
+	@GetMapping("/keyword")
+	public ModelAndView findByKeyword(@RequestParam(value="condition") String condition,
+									  @RequestParam(value="keyword") String keyword,
+									  ModelAndView mv,
+									  @RequestParam(value="page", defaultValue="1") int page) {
+		Map<String, Object> map = boardService.findByKeyword(condition, keyword, page);
+		
+		mv.addObject("map", map).addObject("keyword", keyword).addObject("condition", condition).setViewName("board/boards");
+		
+		return mv;
 	}
 	
 }

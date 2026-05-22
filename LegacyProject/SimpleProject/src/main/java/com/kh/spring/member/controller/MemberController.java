@@ -1,5 +1,7 @@
 package com.kh.spring.member.controller;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
@@ -7,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.kh.spring.member.model.dto.MemberDto;
@@ -200,5 +203,13 @@ public class MemberController {
 		
 		return "redirect:/";
 	}
+	
+	@ResponseBody
+	@GetMapping(value="checkId", produces="application/json; charset=UTF-8")
+	public Map<String, String> checkId(@RequestParam(value="id") String id) {
+		
+		return Map.of("result", memberService.checkId(id));
+	}
+	
 	
 }

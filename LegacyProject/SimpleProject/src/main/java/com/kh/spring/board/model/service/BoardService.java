@@ -33,7 +33,19 @@ public class BoardService {
 
 	private final BoardMapper boardMapper;
 	private final Pagination pagination;
-
+	
+	/*
+	 * 1. @Transactional은 public메서드만 동작
+	 * 
+	 * 2. 같은 클래스 안에서 메서드끼리 호출하면 트랜잭션 안걸림
+	 * 
+	 * 3. CheckedException은 기본적으로 롤백 안됨 => throw new  잘 사용해야함
+	 * 
+	 * 4. 의존성 이슈
+	 */
+	
+	// 안전장치 X => 성능 최적화 + 의도표시
+	@Transactional(readOnly = true) // DB작업할 때 이 트랜잭션은 데이터 변경안합니다 => 힌트 / 조회 성능 향상
 	public Map findAll(int page) {
 		
 		// 유효성 검증
@@ -102,7 +114,6 @@ public class BoardService {
 		board.setBoardTitle(boardTitle);
 		board.setBoardContent(boardContent);
 		
-		
 	}
 	
 	private void fileUpload(MultipartFile upfile, BoardDto board, HttpSession session) {
@@ -130,4 +141,47 @@ public class BoardService {
 			board.setChangeName("/spring/resources/files/" + sb.toString());
 		}
 	}
+
+	
+	public BoardDto findByBoardNo(Long boardNo) {
+		
+		if(boardNo < 1 || boardNo == null) {
+			throw new InvalidParameterException("유효하지 않은 요청입니다");
+		}
+		int result = boardMapper.increaseCount(boardNo);
+		if(result != 1) {
+			throw new InvalidParameterException("잘못된 요청입니다");
+		}
+		BoardDto board = boardMapper.findByBoardNo(boardNo);
+		if(board == null) {
+			throw new InvalidParameterException("존재하지 않는 게시글입니다");
+		}
+		return board;
+	}
+
+	public Map findByKeyword(String condition, String keyword, int page) {
+
+		// 사용자가 선택한 condition과 사용자가 입력한 keyword를 가지고
+		// DB상에서 조건을 걸어 검색해서 나온 조회 결과물을
+		// 페이징 처리까지 끝내고 난 뒤 페이징 객체와 함께 응답할 것
+		
+		int searchedCount = boardMapper.findByKeywordCount(condition, keyword);
+		
+		log.info("검색결과 개수 : {}", searchedCount);
+		
+		PageInfo pi = pagination.getPageInfo(searchedCount, page, 3, 3);
+		
+		RowBounds rb = new RowBounds((page - 1) * 3, 3);
+		
+		List<BoardDto> boards = boardMapper.findByKeyword(condition, keyword, rb);
+		
+		log.info("검색결과 : {}", boards);
+		
+		return Map.of("boards", boards, "pi", pi);
+	}
+	
+	public int count() {
+		return boardMapper.selectTotalCount();
+	}
+	
 }

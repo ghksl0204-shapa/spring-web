@@ -28,6 +28,31 @@
     
     <!-- 메뉴바 -->
     <jsp:include page="../include/header.jsp" />
+   	<script>
+		function idCheck(){
+			//console.log(123);	
+			
+			// 아이디 중복체크 구현하기 
+			// 사용자가 입력한 아이디값
+			
+			const id = document.querySelector("#signup-form>#userId").value;
+			//console.log(id);
+			
+			if(id.length > 4){
+				fetch(`/spring/checkId?id=\${id}`)
+					.then(response => response.json())
+					.then(data =>{
+						console.log(data)
+						if(data.result === 'N'){
+							$('#msg').css('font-size', '12px').css('color', 'red').text('이미 존재하는 아이디입니다.');
+						}else{
+							$('#msg').css('font-size', '12px').css('color', 'green').text('사용 가능한 아이디입니다.');
+						}
+					});
+				
+			}
+		}
+	</script>
 
     <div class="content">
         <br><br>
@@ -36,10 +61,13 @@
             <br>
 
             <form action="members" method="post">
-                <div class="form-group">
+                <div class="form-group" id="signup-form">
                     <label for="userId">* ID : </label>
-                    <input type="text" class="form-control" id="userId" placeholder="Please Enter ID" name="userId" required> <br>
-
+                    <input type="text" class="form-control" id="userId" placeholder="Please Enter ID" name="userId" required
+                    	   onkeyup="idCheck();"> 
+                    	   <!-- onkeyup 키보드 입력 할때 마다 -->
+                   	<label id="msg"></label><br>
+					
                     <label for="userPwd">* Password : </label>
                     <input type="password" class="form-control" id="userPwd" placeholder="Please Enter Password" name="userPwd" required> <br>
 

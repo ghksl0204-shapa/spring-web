@@ -224,6 +224,10 @@ public class MemberServiceImpl{
 		session.removeAttribute("userInfo");
 	}
 	
+	public String checkId(String id) {
+		return memberMapper.checkId(id);
+	}
+	
 	/*
 	 * 쉬운데 어려움(복잡함)
 	 * 
